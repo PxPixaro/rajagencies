@@ -2582,29 +2582,34 @@
 
   
 
-    /* FIX: Hero first-section background image at 50% transparency */
+    /* FIX: Hero first-section background image from assets folder at 50% transparency */
     .hero-bg{
       background:#061120!important;
       position:absolute!important;
       inset:0!important;
       overflow:hidden!important;
+      z-index:0!important;
     }
     .hero-bg::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:url('./Untitled (Whiteboard).jpg') center/cover no-repeat;
-      opacity:.5;
-      z-index:0;
-      pointer-events:none;
+      content:""!important;
+      position:absolute!important;
+      inset:0!important;
+      background-image:url('./assets/Untitled (Whiteboard).jpg'), url('assets/Untitled (Whiteboard).jpg'), url('./Untitled (Whiteboard).jpg')!important;
+      background-position:center center!important;
+      background-size:cover!important;
+      background-repeat:no-repeat!important;
+      opacity:.5!important;
+      z-index:0!important;
+      pointer-events:none!important;
+      display:block!important;
     }
     .hero-bg::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      z-index:1;
-      pointer-events:none;
-      background:linear-gradient(90deg, rgba(6,17,32,.72) 0%, rgba(6,17,32,.62) 38%, rgba(6,17,32,.48) 68%, rgba(6,17,32,.35) 100%);
+      content:""!important;
+      position:absolute!important;
+      inset:0!important;
+      z-index:1!important;
+      pointer-events:none!important;
+      background:linear-gradient(90deg, rgba(6,17,32,.50) 0%, rgba(6,17,32,.46) 38%, rgba(6,17,32,.40) 68%, rgba(6,17,32,.34) 100%)!important;
     }
 </style>
 
