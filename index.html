@@ -248,7 +248,10 @@
       content:"";
       position:absolute;
       inset:0;
-      background:url('./Untitled (Whiteboard).jpg') center/cover no-repeat;
+      background-image:var(--hero-office-bg, url('./assets/Untitled (Whiteboard).jpg'));
+      background-position:center;
+      background-size:cover;
+      background-repeat:no-repeat;
       opacity:.5;
       pointer-events:none;
     }
@@ -6076,6 +6079,31 @@
       if(e.key === 'Escape' && modal.classList.contains('is-open')) closeZoom();
     });
   });
+})();
+</script>
+
+
+<script>
+(function(){
+  /* Hero background image fallback checker: tries assets folder first, then root. */
+  var heroBgCandidates = [
+    './assets/Untitled (Whiteboard).jpg',
+    './assets/Untitled%20(Whiteboard).jpg',
+    './Asset/Untitled (Whiteboard).jpg',
+    './Asset/Untitled%20(Whiteboard).jpg',
+    './Untitled (Whiteboard).jpg',
+    './Untitled%20(Whiteboard).jpg'
+  ];
+  function applyHeroBg(src){
+    document.documentElement.style.setProperty('--hero-office-bg', 'url("' + src.replace(/"/g, '\\"') + '")');
+  }
+  (function tryPath(i){
+    if(i >= heroBgCandidates.length){ return; }
+    var img = new Image();
+    img.onload = function(){ applyHeroBg(heroBgCandidates[i]); };
+    img.onerror = function(){ tryPath(i + 1); };
+    img.src = heroBgCandidates[i];
+  })(0);
 })();
 </script>
 
