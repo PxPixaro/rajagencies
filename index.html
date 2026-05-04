@@ -2682,6 +2682,40 @@
   object-fit:contain !important;
 }
 </style>
+
+<style id="catagory-folder-image-fix">
+/* Catagory folder image fix: original image visible + fallback text only if file missing */
+#product-catagory .product-catagory-img{
+  background:#fff!important;
+  border:2px solid rgba(210,235,255,.96)!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+}
+#product-catagory .product-catagory-img img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:98%!important;
+  max-height:98%!important;
+  object-fit:contain!important;
+  opacity:1!important;
+  visibility:visible!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+}
+#product-catagory .product-catagory-img.is-missing::before{
+  content:attr(data-fallback-title);
+  color:#0d2340;
+  font-size:12px;
+  font-weight:900;
+  line-height:1.25;
+  text-align:center;
+  padding:10px;
+}
+#product-catagory .product-catagory-img.is-missing img{display:none!important;}
+#product-catagory .product-catagory-card h3{color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.55)!important;}
+</style>
 </head>
 <body>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -5163,7 +5197,6 @@
         img.style.mixBlendMode = 'normal';
         img.style.opacity = '1';
       }
-      }
 
       function cleanVisibleCategoryImages(){
         cards.forEach(function(card){
@@ -5755,5 +5788,87 @@
   })();
 </script>
 
+
+<script id="catagory-folder-auto-image-loader">
+/*
+  Catagory folder auto loader/fixer
+  Keep this HTML file and the folder named exactly "Catagory" in the same directory.
+  It tries common image extensions automatically, so images will show even if the file is .jpg/.jpeg/.webp instead of .png.
+*/
+(function(){
+  function ready(fn){
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  function decodeFileName(src){
+    var clean = (src || '').split('#')[0].split('?')[0];
+    var name = clean.substring(clean.lastIndexOf('/') + 1);
+    try { name = decodeURIComponent(name); } catch(e) {}
+    return name;
+  }
+
+  function stripExt(name){
+    return name.replace(/\.(png|jpg|jpeg|webp|gif|avif)$/i, '');
+  }
+
+  function titleCaseFromFile(base){
+    return base.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function makeUrl(base, ext){
+    return './Catagory/' + encodeURIComponent(base).replace(/%20/g, '%20').replace(/%26/g, '%26') + '.' + ext;
+  }
+
+  ready(function(){
+    var grid = document.getElementById('productCatagoryGrid');
+    if (!grid) return;
+
+    var exts = ['png','jpg','jpeg','webp','JPG','JPEG','PNG','WEBP'];
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.product-catagory-card'));
+
+    cards.forEach(function(card){
+      var holder = card.querySelector('.product-catagory-img');
+      var img = holder && holder.querySelector('img');
+      var title = (card.querySelector('h3') && card.querySelector('h3').textContent.trim()) || (img && img.alt) || '';
+      if (holder) holder.setAttribute('data-fallback-title', title || 'Image not found');
+      if (!img) return;
+
+      var fileName = decodeFileName(img.getAttribute('src'));
+      var base = stripExt(fileName) || titleCaseFromFile(title);
+      var tried = {};
+      var queue = [];
+
+      // Try the current path first, then all common extensions in the Catagory folder.
+      queue.push(img.getAttribute('src'));
+      exts.forEach(function(ext){ queue.push(makeUrl(base, ext)); });
+
+      var attempt = 0;
+      img.addEventListener('load', function(){
+        if (holder) holder.classList.remove('is-missing');
+        img.style.opacity = '1';
+        img.style.visibility = 'visible';
+      });
+      img.addEventListener('error', function(){
+        while (attempt < queue.length) {
+          var next = queue[attempt++];
+          if (!next || tried[next]) continue;
+          tried[next] = true;
+          if (img.getAttribute('src') !== next) {
+            img.src = next;
+            return;
+          }
+        }
+        if (holder) holder.classList.add('is-missing');
+      });
+
+      // normalize src through folder path
+      if (!img.complete || img.naturalWidth === 0) {
+        img.src = queue[0];
+      }
+    });
+  });
+})();
+</script>
 </body>
 </html>
