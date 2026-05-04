@@ -240,10 +240,17 @@
     .hero-bg{
       position:absolute;inset:0;
       background:
-        linear-gradient(90deg, rgba(6,17,32,.96) 0%, rgba(6,17,32,.84) 38%, rgba(6,17,32,.56) 68%, rgba(6,17,32,.22) 100%),
-        url('./assets/hero-bg.jpg') center/cover no-repeat;
+        linear-gradient(90deg, rgba(6,17,32,.96) 0%, rgba(6,17,32,.84) 38%, rgba(6,17,32,.56) 68%, rgba(6,17,32,.22) 100%);
       transform:scale(1.03);
       animation:heroZoom 18s ease-in-out infinite alternate;
+    }
+    .hero-bg::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:url('./Untitled (Whiteboard).jpg') center/cover no-repeat;
+      opacity:.5;
+      pointer-events:none;
     }
     @keyframes heroZoom{from{transform:scale(1.02)}to{transform:scale(1.08)}}
     .hero-overlay{
@@ -5593,7 +5600,8 @@
           var haystack = [item.name, item.priceFile || '', item.catalogFile || ''].join(' ').toLowerCase();
           var letterMatch = activeLetter === 'ALL' || letterKey(item) === activeLetter;
           var searchMatch = !query || haystack.indexOf(query) !== -1;
-          return letterMatch && searchMatch;
+          // Search ko global rakha hai: alphabet A/B/C selected ho tab bhi MEKO ya koi bhi brand search hoga.
+          return query ? searchMatch : letterMatch;
         });
       }
 
