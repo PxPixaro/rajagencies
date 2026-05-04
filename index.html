@@ -5870,5 +5870,169 @@
   });
 })();
 </script>
+
+
+<!-- FINAL ADD: Product Catagory image click zoom + close button (no other changes) -->
+<style id="product-catagory-click-zoom-final-css">
+  .product-catagory-card,
+  .product-catagory-img,
+  .product-catagory-img img{cursor:zoom-in!important}
+  #productCatagoryModal.product-catagory-modal{
+    position:fixed!important;
+    inset:0!important;
+    z-index:99999!important;
+    display:none;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:22px!important;
+    background:rgba(3,9,18,.88)!important;
+    backdrop-filter:blur(14px)!important;
+  }
+  #productCatagoryModal.product-catagory-modal.is-open{display:flex!important}
+  #productCatagoryModal .product-catagory-modal-card{
+    width:min(94vw,980px)!important;
+    max-height:92vh!important;
+    padding:18px!important;
+    border-radius:28px!important;
+    background:linear-gradient(180deg, rgba(13,35,64,.98), rgba(6,17,32,.98))!important;
+    border:1px solid rgba(255,255,255,.16)!important;
+    box-shadow:0 34px 100px rgba(0,0,0,.62)!important;
+    position:relative!important;
+    animation:productCatagoryModalZoomFinal .2s ease both!important;
+  }
+  @keyframes productCatagoryModalZoomFinal{
+    from{opacity:0;transform:scale(.92)}
+    to{opacity:1;transform:scale(1)}
+  }
+  #productCatagoryModal .product-catagory-modal-close{
+    position:absolute!important;
+    right:16px!important;
+    top:16px!important;
+    z-index:3!important;
+    min-width:48px!important;
+    min-height:48px!important;
+    padding:0 16px!important;
+    border-radius:999px!important;
+    border:1px solid rgba(255,255,255,.22)!important;
+    background:linear-gradient(135deg,var(--orange),var(--yellow))!important;
+    color:#111!important;
+    font-weight:1000!important;
+    cursor:pointer!important;
+    box-shadow:0 16px 30px rgba(245,166,35,.24)!important;
+  }
+  #productCatagoryModal .product-catagory-modal-img{
+    min-height:min(68vh,620px)!important;
+    border-radius:22px!important;
+    display:grid!important;
+    place-items:center!important;
+    overflow:hidden!important;
+    background:#fff!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    padding:24px!important;
+  }
+  #productCatagoryModal .product-catagory-modal-img img{
+    max-width:100%!important;
+    max-height:min(64vh,560px)!important;
+    width:auto!important;
+    height:auto!important;
+    object-fit:contain!important;
+    cursor:zoom-out!important;
+    filter:none!important;
+    transform:none!important;
+  }
+  #productCatagoryModal .product-catagory-modal-title{
+    margin:16px 56px 2px!important;
+    color:#fff!important;
+    font-size:clamp(20px, 3vw, 30px)!important;
+    line-height:1.15!important;
+    text-align:center!important;
+  }
+  body.product-catagory-preview-open{overflow:hidden!important}
+  @media (max-width:680px){
+    #productCatagoryModal.product-catagory-modal{padding:12px!important}
+    #productCatagoryModal .product-catagory-modal-card{padding:12px!important;border-radius:22px!important}
+    #productCatagoryModal .product-catagory-modal-img{min-height:58vh!important;padding:14px!important;border-radius:18px!important}
+    #productCatagoryModal .product-catagory-modal-close{right:10px!important;top:10px!important;min-width:42px!important;min-height:42px!important}
+    #productCatagoryModal .product-catagory-modal-title{margin:12px 44px 0!important;font-size:18px!important}
+  }
+</style>
+<script id="product-catagory-click-zoom-final-js">
+(function(){
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+  ready(function(){
+    var grid = document.getElementById('productCatagoryGrid');
+    if(!grid) return;
+
+    var modal = document.getElementById('productCatagoryModal');
+    if(!modal){
+      modal = document.createElement('div');
+      modal.id = 'productCatagoryModal';
+      modal.className = 'product-catagory-modal';
+      modal.setAttribute('aria-hidden','true');
+      modal.setAttribute('role','dialog');
+      modal.setAttribute('aria-modal','true');
+      modal.innerHTML = '<div class="product-catagory-modal-card" role="document"><button class="product-catagory-modal-close" type="button" id="productCatagoryModalClose" aria-label="Close preview">Close ×</button><div class="product-catagory-modal-img"><img id="productCatagoryModalImage" src="" alt="" /></div><h3 class="product-catagory-modal-title" id="productCatagoryModalTitle">Product Catagory</h3></div>';
+      document.body.appendChild(modal);
+    }
+
+    var modalImage = document.getElementById('productCatagoryModalImage');
+    var modalTitle = document.getElementById('productCatagoryModalTitle');
+    var modalClose = document.getElementById('productCatagoryModalClose');
+    var lastScrollY = 0;
+
+    function cardTitle(card){
+      var title = card && card.querySelector('h3');
+      var img = card && card.querySelector('img');
+      return (title && title.textContent.trim()) || (img && img.alt) || 'Product Catagory';
+    }
+
+    function openZoom(card){
+      var img = card && card.querySelector('.product-catagory-img img');
+      if(!img || !modal || !modalImage) return;
+      lastScrollY = window.scrollY || window.pageYOffset || 0;
+      modalImage.src = img.currentSrc || img.src;
+      modalImage.alt = img.alt || cardTitle(card);
+      if(modalTitle) modalTitle.textContent = cardTitle(card);
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.classList.add('product-catagory-preview-open');
+      if(modalClose) setTimeout(function(){ modalClose.focus({preventScroll:true}); }, 20);
+    }
+
+    function closeZoom(){
+      if(!modal) return;
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden','true');
+      document.body.classList.remove('product-catagory-preview-open');
+      if(lastScrollY) window.scrollTo({top:lastScrollY, behavior:'auto'});
+    }
+
+    grid.addEventListener('click', function(e){
+      var card = e.target.closest && e.target.closest('.product-catagory-card');
+      if(!card || !grid.contains(card)) return;
+      openZoom(card);
+    }, true);
+
+    grid.addEventListener('keydown', function(e){
+      if(e.key !== 'Enter' && e.key !== ' ') return;
+      var card = e.target.closest && e.target.closest('.product-catagory-card');
+      if(!card || !grid.contains(card)) return;
+      e.preventDefault();
+      openZoom(card);
+    }, true);
+
+    if(modalClose) modalClose.addEventListener('click', closeZoom);
+    if(modalImage) modalImage.addEventListener('click', closeZoom);
+    modal.addEventListener('click', function(e){ if(e.target === modal) closeZoom(); });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && modal.classList.contains('is-open')) closeZoom();
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
