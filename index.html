@@ -2580,7 +2580,33 @@
     }
 
 
-  </style>
+  
+
+    /* FIX: Hero first-section background image at 50% transparency */
+    .hero-bg{
+      background:#061120!important;
+      position:absolute!important;
+      inset:0!important;
+      overflow:hidden!important;
+    }
+    .hero-bg::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:url('./Untitled (Whiteboard).jpg') center/cover no-repeat;
+      opacity:.5;
+      z-index:0;
+      pointer-events:none;
+    }
+    .hero-bg::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background:linear-gradient(90deg, rgba(6,17,32,.72) 0%, rgba(6,17,32,.62) 38%, rgba(6,17,32,.48) 68%, rgba(6,17,32,.35) 100%);
+    }
+</style>
 
 <style id="raj-final-category-visible-fix">
 /* FINAL FIX BY CHATGPT: Product Catagory images original visible mode */
@@ -5594,13 +5620,18 @@
         });
       }
 
+      function normalizeSearchText(text){
+        return String(text || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+      }
+
       function getFiltered(items){
-        var query = (search && search.value ? search.value : '').toLowerCase().trim();
+        var rawQuery = search && search.value ? search.value : '';
+        var query = normalizeSearchText(rawQuery);
         return items.filter(function(item){
-          var haystack = [item.name, item.priceFile || '', item.catalogFile || ''].join(' ').toLowerCase();
+          var haystack = normalizeSearchText([item.name, item.priceFile || '', item.catalogFile || ''].join(' '));
           var letterMatch = activeLetter === 'ALL' || letterKey(item) === activeLetter;
           var searchMatch = !query || haystack.indexOf(query) !== -1;
-          // Search ko global rakha hai: alphabet A/B/C selected ho tab bhi MEKO ya koi bhi brand search hoga.
+          // Query type karte hi search ALL data me chalega, selected alphabet ko ignore karega.
           return query ? searchMatch : letterMatch;
         });
       }
@@ -5680,6 +5711,7 @@
       if (search) {
         search.addEventListener('input', function(){
           activePage = 1;
+          if (normalizeSearchText(search.value)) activeLetter = 'ALL';
           render(allItems);
         });
       }
