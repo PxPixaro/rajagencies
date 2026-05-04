@@ -2575,88 +2575,60 @@
 
   </style>
 
-
-<style id="final-category-visibility-fix">
-/* ===== FINAL FIX: Category images visible on website =====
-   Transparent PNG product images were blending into the dark glass frame.
-   This override makes the product preview frame clean white and removes
-   dark filters/overlays so every category image is clearly visible. */
-.product-catagory-card.card::before,
-.product-catagory-card.card::after,
-.product-catagory-img::before,
-.product-catagory-img::after{
-  display:none !important;
-  content:none !important;
+<style id="raj-final-category-visible-fix">
+/* FINAL FIX BY CHATGPT: Product Catagory images original visible mode */
+#product-catagory .product-catagory-card{
+  background:linear-gradient(180deg, rgba(13,35,64,.96), rgba(6,20,38,.98))!important;
+  border:1px solid rgba(86,170,255,.35)!important;
 }
-.product-catagory-card{
-  background:linear-gradient(180deg, rgba(9,31,58,.98), rgba(4,17,34,.98)) !important;
-  border:1px solid rgba(96,165,250,.26) !important;
-  box-shadow:0 14px 30px rgba(0,0,0,.26) !important;
+#product-catagory .product-catagory-img{
+  background:#ffffff!important;
+  background-image:none!important;
+  border:2px solid rgba(210,235,255,.96)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95), 0 10px 22px rgba(0,0,0,.18)!important;
+  overflow:hidden!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:6px!important;
 }
-.product-catagory-img{
-  position:relative !important;
-  isolation:isolate !important;
-  background:#ffffff !important;
-  background-image:none !important;
-  border:2px solid rgba(210,230,255,.95) !important;
-  box-shadow:inset 0 0 0 1px rgba(15,23,42,.08), 0 10px 22px rgba(0,0,0,.18) !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-  padding:8px !important;
-  overflow:hidden !important;
+#product-catagory .product-catagory-img::before,
+#product-catagory .product-catagory-img::after{
+  display:none!important;
+  content:none!important;
 }
-.product-catagory-img img,
-.product-catagory-img img.is-bg-cleaning,
-.product-catagory-img img.is-bg-cleaned,
-.product-catagory-card img{
-  opacity:1 !important;
-  visibility:visible !important;
-  mix-blend-mode:normal !important;
-  filter:none !important;
-  background:transparent !important;
-  width:auto !important;
-  height:auto !important;
-  max-width:96% !important;
-  max-height:96% !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  transform:none !important;
-  animation:none !important;
+#product-catagory .product-catagory-img img,
+#product-catagory .product-catagory-img img.is-bg-cleaned,
+#product-catagory .product-catagory-img img.is-bg-strong-cleaned,
+#product-catagory .product-catagory-img img.is-final-transparent-png{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:98%!important;
+  max-height:98%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  opacity:1!important;
+  visibility:visible!important;
+  mix-blend-mode:normal!important;
+  filter:none!important;
+  background:transparent!important;
+  padding:0!important;
+  margin:auto!important;
+  transform:none!important;
 }
-.product-catagory-card:hover .product-catagory-img img{
-  transform:scale(1.03) !important;
+#product-catagory .product-catagory-card:hover .product-catagory-img img{
+  transform:scale(1.03)!important;
 }
-.product-catagory-modal-img{
-  background:#ffffff !important;
-  background-image:none !important;
-  border:2px solid rgba(210,230,255,.95) !important;
-  box-shadow:0 24px 60px rgba(0,0,0,.35) !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
+#product-catagory .product-catagory-modal-img{
+  background:#ffffff!important;
+  background-image:none!important;
 }
-.product-catagory-modal-img::before,
-.product-catagory-modal-img::after{
-  display:none !important;
-  content:none !important;
-}
-.product-catagory-modal-img img,
-.product-catagory-modal-img img.is-bg-cleaning,
-.product-catagory-modal-img img.is-bg-cleaned{
-  opacity:1 !important;
-  visibility:visible !important;
-  mix-blend-mode:normal !important;
-  filter:none !important;
-  background:transparent !important;
-  max-width:98% !important;
-  max-height:min(62vh, 520px) !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-}
-@media (max-width:760px){
-  .product-catagory-img{padding:7px !important;}
-  .product-catagory-img img,
-  .product-catagory-img img.is-bg-cleaned,
-  .product-catagory-img img.is-bg-cleaning{max-width:97% !important;max-height:97% !important;}
+#product-catagory .product-catagory-modal-img img{
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  opacity:1!important;
+  max-width:96%!important;
+  max-height:min(72vh, 620px)!important;
 }
 </style>
 
@@ -5132,69 +5104,12 @@
       }
 
       function cleanCategoryImageBackground(img){
-        if (!img || img.dataset.bgCleanStarted === '1') return;
-        img.dataset.bgCleanStarted = '1';
-        img.classList.add('is-bg-cleaning');
-
-        function run(){
-          try{
-            var source = img.currentSrc || img.src;
-            if (!source) return;
-            if (!img.dataset.originalSrc) img.dataset.originalSrc = source;
-
-            var loader = new Image();
-            loader.onload = function(){
-              try{
-                var naturalW = loader.naturalWidth || loader.width;
-                var naturalH = loader.naturalHeight || loader.height;
-                if (!naturalW || !naturalH) return;
-
-                var maxSide = 720;
-                var scale = Math.min(1, maxSide / Math.max(naturalW, naturalH));
-                var w = Math.max(1, Math.round(naturalW * scale));
-                var h = Math.max(1, Math.round(naturalH * scale));
-
-                var canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
-                var ctx = canvas.getContext('2d', {willReadFrequently:true});
-                ctx.clearRect(0, 0, w, h);
-                ctx.drawImage(loader, 0, 0, w, h);
-
-                var imageData = ctx.getImageData(0, 0, w, h);
-                var removedLight = removeConnectedBackground(imageData, w, h, 'light');
-                var removedDark = removeConnectedBackground(imageData, w, h, 'dark');
-
-                if (removedLight || removedDark) {
-                  softenEdges(imageData, w, h);
-                  ctx.putImageData(imageData, 0, 0);
-                  var png = makeTrimmedPng(canvas, imageData);
-                  img.dataset.cleanedSrc = png;
-                  img.src = png;
-                }
-
-                img.classList.remove('is-bg-cleaning');
-                img.classList.add('is-bg-cleaned');
-              } catch(err){
-                img.classList.remove('is-bg-cleaning');
-                img.classList.add('is-bg-cleaned');
-              }
-            };
-            loader.onerror = function(){
-              img.classList.remove('is-bg-cleaning');
-              img.classList.add('is-bg-cleaned');
-            };
-            loader.src = source;
-          } catch(err){
-            img.classList.remove('is-bg-cleaning');
-            img.classList.add('is-bg-cleaned');
-          }
-        }
-
-        if (img.complete && img.naturalWidth) {
-          window.requestAnimationFrame(run);
-        } else {
-          img.addEventListener('load', function(){ window.requestAnimationFrame(run); }, {once:true});
+        if (!img) return;
+        /* Background removal disabled: original product PNG/JPG image ko as-it-is dikhana hai. */
+        img.classList.remove('is-bg-cleaning','is-bg-cleaning-strong');
+        img.classList.add('is-bg-cleaned','is-final-transparent-png');
+        if (img.dataset.originalSrc && img.src !== img.dataset.originalSrc) {
+          img.src = img.dataset.originalSrc;
         }
       }
 
