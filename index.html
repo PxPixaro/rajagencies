@@ -2632,6 +2632,56 @@
 }
 </style>
 
+<style>
+
+/* ===== FINAL FIX BY CHATGPT: Category images original visible, no canvas/no filter ===== */
+#product-catagory .product-catagory-img{
+  background:#ffffff !important;
+  background-image:none !important;
+  border:2px solid rgba(213,232,255,.95) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.96), 0 10px 22px rgba(0,0,0,.12) !important;
+  overflow:hidden !important;
+}
+#product-catagory .product-catagory-img::before,
+#product-catagory .product-catagory-img::after{
+  display:none !important;
+  content:none !important;
+}
+#product-catagory .product-catagory-img img,
+#product-catagory .product-catagory-img img.is-bg-cleaned,
+#product-catagory .product-catagory-img img.is-bg-strong-cleaned,
+#product-catagory .product-catagory-img img.is-final-transparent-png{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:96% !important;
+  max-height:96% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+  background:transparent !important;
+  padding:0 !important;
+  margin:auto !important;
+  transform:none !important;
+  image-rendering:auto !important;
+}
+#product-catagory .product-catagory-card:hover .product-catagory-img img{
+  transform:none !important;
+}
+#product-catagory .product-catagory-modal-img{
+  background:#ffffff !important;
+  background-image:none !important;
+}
+#product-catagory .product-catagory-modal-img img{
+  filter:none !important;
+  mix-blend-mode:normal !important;
+  opacity:1 !important;
+  object-fit:contain !important;
+}
+</style>
 </head>
 <body>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -5105,12 +5155,14 @@
 
       function cleanCategoryImageBackground(img){
         if (!img) return;
-        /* Background removal disabled: original product PNG/JPG image ko as-it-is dikhana hai. */
-        img.classList.remove('is-bg-cleaning','is-bg-cleaning-strong');
-        img.classList.add('is-bg-cleaned','is-final-transparent-png');
-        if (img.dataset.originalSrc && img.src !== img.dataset.originalSrc) {
-          img.src = img.dataset.originalSrc;
-        }
+        /* Disabled: category image background-removal/filter processing. Show original uploaded image only. */
+        var original = img.dataset.originalSrc || img.getAttribute('data-original-src');
+        if (original && img.src !== original) img.src = original;
+        img.classList.remove('is-bg-cleaning','is-bg-cleaning-strong','is-bg-cleaned','is-bg-strong-cleaned','is-final-transparent-png');
+        img.style.filter = 'none';
+        img.style.mixBlendMode = 'normal';
+        img.style.opacity = '1';
+      }
       }
 
       function cleanVisibleCategoryImages(){
@@ -5648,525 +5700,6 @@
     });
   })();
 </script>
-
-
-
-<script id="product-catagory-strong-transparent-png-fix">
-  /* Stronger Product Catagory transparent PNG conversion + smaller full-image fit */
-  (function(){
-    var grid = document.getElementById('productCatagoryGrid');
-    if (!grid) return;
-
-    function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
-
-    function pixelInfo(data, p){
-      var i = p * 4;
-      var r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-      var max = Math.max(r, g, b), min = Math.min(r, g, b);
-      var lum = (r + g + b) / 3;
-      var sat = max - min;
-      return {r:r, g:g, b:b, a:a, lum:lum, sat:sat};
-    }
-
-    function getVisibleBounds(data, w, h){
-      var minX = w, minY = h, maxX = -1, maxY = -1;
-      for (var y = 0; y < h; y++){
-        for (var x = 0; x < w; x++){
-          if (data[(y * w + x) * 4 + 3] > 16){
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-          }
-        }
-      }
-      if (maxX < minX || maxY < minY) return null;
-      return {minX:minX, minY:minY, maxX:maxX, maxY:maxY};
-    }
-
-    function sampleBorderColor(data, w, h, b){
-      var r = 0, g = 0, bl = 0, count = 0;
-      var step = Math.max(1, Math.floor(Math.min(b.maxX - b.minX + 1, b.maxY - b.minY + 1) / 90));
-      function add(x, y){
-        var p = y * w + x;
-        var info = pixelInfo(data, p);
-        if (info.a < 18) return;
-        if ((info.lum > 155 && info.sat < 120) || (info.lum < 86 && info.sat < 100)){
-          r += info.r; g += info.g; bl += info.b; count++;
-        }
-      }
-      for (var x = b.minX; x <= b.maxX; x += step){ add(x, b.minY); add(x, b.maxY); }
-      for (var y = b.minY; y <= b.maxY; y += step){ add(b.minX, y); add(b.maxX, y); }
-      if (!count) return null;
-      return {r:r/count, g:g/count, b:bl/count};
-    }
-
-    function removeBackground(imageData, w, h){
-      var data = imageData.data;
-      var bounds = getVisibleBounds(data, w, h);
-      if (!bounds) return 0;
-      var border = sampleBorderColor(data, w, h, bounds);
-      var visited = new Uint8Array(w * h);
-      var queue = [];
-      var removed = 0;
-
-      function isBg(p){
-        var info = pixelInfo(data, p);
-        if (info.a < 18) return true;
-
-        var lightNeutral = info.lum > 178 && info.sat < 120;
-        var whiteLike = info.lum > 205 && info.sat < 145;
-        var darkNeutral = info.lum < 68 && info.sat < 105;
-        var greyBlueBg = info.lum > 82 && info.lum < 190 && info.sat < 58;
-
-        var nearBorder = false;
-        if (border){
-          var dist = Math.abs(info.r - border.r) + Math.abs(info.g - border.g) + Math.abs(info.b - border.b);
-          nearBorder = dist < 92;
-        }
-
-        return whiteLike || lightNeutral || darkNeutral || greyBlueBg || nearBorder;
-      }
-
-      function push(x, y){
-        if (x < 0 || y < 0 || x >= w || y >= h) return;
-        var p = y * w + x;
-        if (visited[p]) return;
-        if (!isBg(p)) return;
-        visited[p] = 1;
-        queue.push(p);
-      }
-
-      /* Outer canvas edges */
-      for (var x = 0; x < w; x++){ push(x, 0); push(x, h - 1); }
-      for (var y = 0; y < h; y++){ push(0, y); push(w - 1, y); }
-
-      /* Visible photo rectangle edges, useful when a PNG has transparent padding outside a white box */
-      for (var bx = bounds.minX; bx <= bounds.maxX; bx++){ push(bx, bounds.minY); push(bx, bounds.maxY); }
-      for (var by = bounds.minY; by <= bounds.maxY; by++){ push(bounds.minX, by); push(bounds.maxX, by); }
-
-      for (var head = 0; head < queue.length; head++){
-        var p = queue[head];
-        var px = p % w;
-        var py = (p - px) / w;
-        push(px + 1, py); push(px - 1, py); push(px, py + 1); push(px, py - 1);
-      }
-
-      for (var q = 0; q < queue.length; q++){
-        var ai = queue[q] * 4 + 3;
-        if (data[ai] !== 0){ data[ai] = 0; removed++; }
-      }
-
-      /* Soft halo cleanup near removed background */
-      var copy = new Uint8ClampedArray(data);
-      for (var yy = 1; yy < h - 1; yy++){
-        for (var xx = 1; xx < w - 1; xx++){
-          var pp = yy * w + xx;
-          var aa = copy[pp * 4 + 3];
-          if (aa < 20) continue;
-          var touchesTransparent =
-            copy[((yy - 1) * w + xx) * 4 + 3] === 0 ||
-            copy[((yy + 1) * w + xx) * 4 + 3] === 0 ||
-            copy[(yy * w + xx - 1) * 4 + 3] === 0 ||
-            copy[(yy * w + xx + 1) * 4 + 3] === 0;
-          if (!touchesTransparent) continue;
-          var pi = pixelInfo(copy, pp);
-          if ((pi.lum > 185 && pi.sat < 130) || (pi.lum < 72 && pi.sat < 105)){
-            data[pp * 4 + 3] = Math.min(data[pp * 4 + 3], 42);
-          }
-        }
-      }
-      return removed;
-    }
-
-    function cropTransparent(canvas, imageData){
-      var w = canvas.width, h = canvas.height, data = imageData.data;
-      var b = getVisibleBounds(data, w, h);
-      if (!b) return canvas.toDataURL('image/png');
-      var bw = b.maxX - b.minX + 1;
-      var bh = b.maxY - b.minY + 1;
-      var pad = Math.ceil(Math.max(bw, bh) * 0.14);
-      b.minX = clamp(b.minX - pad, 0, w - 1);
-      b.minY = clamp(b.minY - pad, 0, h - 1);
-      b.maxX = clamp(b.maxX + pad, 0, w - 1);
-      b.maxY = clamp(b.maxY + pad, 0, h - 1);
-      var outW = b.maxX - b.minX + 1;
-      var outH = b.maxY - b.minY + 1;
-      var out = document.createElement('canvas');
-      out.width = outW; out.height = outH;
-      var octx = out.getContext('2d');
-      octx.putImageData(imageData, -b.minX, -b.minY);
-      return out.toDataURL('image/png');
-    }
-
-    function cleanOne(img){
-      if (!img || img.dataset.strongBgDone === '1' || img.dataset.strongBgRunning === '1') return;
-      img.dataset.strongBgRunning = '1';
-      img.classList.add('is-bg-cleaning-strong');
-
-      function run(){
-        try{
-          var source = img.dataset.originalSrc || img.getAttribute('data-original-src') || img.currentSrc || img.src;
-          if (!source) return finish(false);
-          if (source.indexOf('data:image') === 0 && img.dataset.originalSrc) source = img.dataset.originalSrc;
-          if (!img.dataset.originalSrc && source.indexOf('data:image') !== 0) img.dataset.originalSrc = source;
-
-          var loader = new Image();
-          loader.onload = function(){
-            try{
-              var naturalW = loader.naturalWidth || loader.width;
-              var naturalH = loader.naturalHeight || loader.height;
-              if (!naturalW || !naturalH) return finish(false);
-              var maxSide = 900;
-              var scale = Math.min(1, maxSide / Math.max(naturalW, naturalH));
-              var w = Math.max(1, Math.round(naturalW * scale));
-              var h = Math.max(1, Math.round(naturalH * scale));
-              var canvas = document.createElement('canvas');
-              canvas.width = w; canvas.height = h;
-              var ctx = canvas.getContext('2d', {willReadFrequently:true});
-              ctx.clearRect(0, 0, w, h);
-              ctx.drawImage(loader, 0, 0, w, h);
-              var imageData = ctx.getImageData(0, 0, w, h);
-              var removed = removeBackground(imageData, w, h);
-              if (removed > 0){
-                ctx.putImageData(imageData, 0, 0);
-                var png = cropTransparent(canvas, imageData);
-                img.dataset.cleanedSrc = png;
-                img.src = png;
-              }
-              finish(true);
-            } catch(e){ finish(false); }
-          };
-          loader.onerror = function(){ finish(false); };
-          loader.src = source;
-        } catch(e){ finish(false); }
-      }
-
-      function finish(ok){
-        img.dataset.strongBgDone = '1';
-        img.dataset.strongBgRunning = '0';
-        img.classList.remove('is-bg-cleaning-strong');
-        img.classList.add('is-bg-strong-cleaned');
-      }
-
-      if (img.complete && img.naturalWidth) window.setTimeout(run, 25);
-      else img.addEventListener('load', function(){ window.setTimeout(run, 25); }, {once:true});
-    }
-
-    function cleanVisible(){
-      Array.prototype.forEach.call(grid.querySelectorAll('.product-catagory-card:not(.is-hidden) .product-catagory-img img'), cleanOne);
-    }
-
-    function cleanAllSlowly(){
-      var imgs = Array.prototype.slice.call(grid.querySelectorAll('.product-catagory-img img'));
-      var i = 0;
-      function step(){
-        var end = Math.min(i + 4, imgs.length);
-        for (; i < end; i++) cleanOne(imgs[i]);
-        if (i < imgs.length) window.setTimeout(step, 180);
-      }
-      step();
-    }
-
-    cleanVisible();
-    window.setTimeout(cleanAllSlowly, 500);
-    grid.addEventListener('click', function(){ window.setTimeout(cleanVisible, 80); });
-
-    var next = document.getElementById('productCatagoryNext');
-    var prev = document.getElementById('productCatagoryPrev');
-    if (next) next.addEventListener('click', function(){ window.setTimeout(cleanVisible, 120); });
-    if (prev) prev.addEventListener('click', function(){ window.setTimeout(cleanVisible, 120); });
-
-    var observer = new MutationObserver(function(){ window.setTimeout(cleanVisible, 60); });
-    observer.observe(grid, {subtree:true, attributes:true, attributeFilter:['class', 'src']});
-  })();
-</script>
-
-
-<script id="product-catagory-full-image-transparent-png-final">
-  /* FINAL FIX: remove visible photo background and keep full image inside small grid frame */
-  (function(){
-    function ready(fn){
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
-      else fn();
-    }
-
-    ready(function(){
-      var grid = document.getElementById('productCatagoryGrid');
-      if (!grid) return;
-      var FRAME_RATIO = 1 / .72;
-      var PAGE_SIZE = 25;
-
-      function getSource(img){
-        var source = img.dataset.originalSrc || img.getAttribute('data-original-src') || img.getAttribute('src') || img.currentSrc || img.src;
-        if (source && source.indexOf('data:image') === 0 && img.dataset.originalSrc) source = img.dataset.originalSrc;
-        return source;
-      }
-
-      function info(data, p){
-        var i = p * 4;
-        var r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-        var max = Math.max(r, g, b), min = Math.min(r, g, b);
-        return {r:r, g:g, b:b, a:a, lum:(r + g + b) / 3, sat:max - min};
-      }
-
-      function visibleBounds(data, w, h, minAlpha){
-        var minX = w, minY = h, maxX = -1, maxY = -1;
-        minAlpha = minAlpha || 16;
-        for (var y = 0; y < h; y++){
-          for (var x = 0; x < w; x++){
-            if (data[(y * w + x) * 4 + 3] > minAlpha){
-              if (x < minX) minX = x;
-              if (x > maxX) maxX = x;
-              if (y < minY) minY = y;
-              if (y > maxY) maxY = y;
-            }
-          }
-        }
-        if (maxX < minX || maxY < minY) return null;
-        return {minX:minX, minY:minY, maxX:maxX, maxY:maxY};
-      }
-
-      function sampleBgColors(data, w, h, b){
-        var colors = [];
-        var patch = Math.max(4, Math.floor(Math.min(b.maxX - b.minX + 1, b.maxY - b.minY + 1) * .08));
-        var zones = [
-          [b.minX, b.minY, b.minX + patch, b.minY + patch],
-          [b.maxX - patch, b.minY, b.maxX, b.minY + patch],
-          [b.minX, b.maxY - patch, b.minX + patch, b.maxY],
-          [b.maxX - patch, b.maxY - patch, b.maxX, b.maxY]
-        ];
-        zones.forEach(function(z){
-          var r = 0, g = 0, bl = 0, c = 0;
-          for (var y = Math.max(0, z[1]); y <= Math.min(h - 1, z[3]); y += 2){
-            for (var x = Math.max(0, z[0]); x <= Math.min(w - 1, z[2]); x += 2){
-              var pi = info(data, y * w + x);
-              if (pi.a < 18) continue;
-              /* corners of category images are normally background: white, grey, blue-grey or dark */
-              if (pi.lum > 170 || pi.lum < 82 || pi.sat < 85){
-                r += pi.r; g += pi.g; bl += pi.b; c++;
-              }
-            }
-          }
-          if (c) colors.push({r:r/c, g:g/c, b:bl/c});
-        });
-        return colors;
-      }
-
-      function colorDistance(a, c){
-        return Math.abs(a.r - c.r) + Math.abs(a.g - c.g) + Math.abs(a.b - c.b);
-      }
-
-      function removeConnectedBackground(imageData, w, h){
-        var data = imageData.data;
-        var b = visibleBounds(data, w, h, 12);
-        if (!b) return null;
-        var bgColors = sampleBgColors(data, w, h, b);
-        var visited = new Uint8Array(w * h);
-        var queue = [];
-
-        function isBackground(p){
-          var pi = info(data, p);
-          if (pi.a < 18) return true;
-          var white = pi.lum > 205 && pi.sat < 140;
-          var lightGrey = pi.lum > 178 && pi.sat < 95;
-          var darkNeutral = pi.lum < 58 && pi.sat < 82;
-          var greyBlue = pi.lum > 75 && pi.lum < 205 && pi.sat < 64;
-          var nearSample = false;
-          for (var i = 0; i < bgColors.length; i++){
-            if (colorDistance(pi, bgColors[i]) < 112) { nearSample = true; break; }
-          }
-          return white || lightGrey || darkNeutral || greyBlue || nearSample;
-        }
-
-        function push(x, y){
-          if (x < 0 || y < 0 || x >= w || y >= h) return;
-          var p = y * w + x;
-          if (visited[p]) return;
-          if (!isBackground(p)) return;
-          visited[p] = 1;
-          queue.push(p);
-        }
-
-        /* Start flood-fill from actual image edge and visible photo rectangle edge. */
-        for (var x = 0; x < w; x++){ push(x, 0); push(x, h - 1); }
-        for (var y = 0; y < h; y++){ push(0, y); push(w - 1, y); }
-        for (var bx = b.minX; bx <= b.maxX; bx++){ push(bx, b.minY); push(bx, b.maxY); }
-        for (var by = b.minY; by <= b.maxY; by++){ push(b.minX, by); push(b.maxX, by); }
-
-        for (var head = 0; head < queue.length; head++){
-          var p = queue[head];
-          var px = p % w;
-          var py = (p - px) / w;
-          push(px + 1, py); push(px - 1, py); push(px, py + 1); push(px, py - 1);
-        }
-
-        for (var q = 0; q < queue.length; q++) data[queue[q] * 4 + 3] = 0;
-
-        /* soften white/grey halo only around the removed background */
-        var copy = new Uint8ClampedArray(data);
-        for (var yy = 1; yy < h - 1; yy++){
-          for (var xx = 1; xx < w - 1; xx++){
-            var pp = yy * w + xx;
-            if (copy[pp * 4 + 3] < 20) continue;
-            var nearTransparent =
-              copy[((yy - 1) * w + xx) * 4 + 3] === 0 ||
-              copy[((yy + 1) * w + xx) * 4 + 3] === 0 ||
-              copy[(yy * w + xx - 1) * 4 + 3] === 0 ||
-              copy[(yy * w + xx + 1) * 4 + 3] === 0;
-            if (!nearTransparent) continue;
-            var pi = info(copy, pp);
-            if ((pi.lum > 190 && pi.sat < 140) || (pi.lum < 60 && pi.sat < 82) || (pi.sat < 48 && pi.lum > 80)) {
-              data[pp * 4 + 3] = Math.min(data[pp * 4 + 3], 48);
-            }
-          }
-        }
-        return visibleBounds(data, w, h, 22);
-      }
-
-      function makePaddedPng(sourceCanvas, imageData, productBounds){
-        var w = sourceCanvas.width, h = sourceCanvas.height;
-        if (!productBounds) return sourceCanvas.toDataURL('image/png');
-        var cropW = productBounds.maxX - productBounds.minX + 1;
-        var cropH = productBounds.maxY - productBounds.minY + 1;
-
-        /* Make transparent PNG with extra empty space so grid thumbnails never cut the product. */
-        var targetW = Math.max(cropW * 1.38, cropH * 1.38 * FRAME_RATIO);
-        var targetH = targetW / FRAME_RATIO;
-        if (targetH < cropH * 1.38) {
-          targetH = cropH * 1.38;
-          targetW = targetH * FRAME_RATIO;
-        }
-        targetW = Math.ceil(Math.min(1200, Math.max(220, targetW)));
-        targetH = Math.ceil(Math.min(900, Math.max(160, targetH)));
-
-        var out = document.createElement('canvas');
-        out.width = targetW;
-        out.height = targetH;
-        var octx = out.getContext('2d');
-        var scale = Math.min((targetW * .76) / cropW, (targetH * .76) / cropH, 1.8);
-        var dw = Math.round(cropW * scale);
-        var dh = Math.round(cropH * scale);
-        var dx = Math.round((targetW - dw) / 2);
-        var dy = Math.round((targetH - dh) / 2);
-
-        var tmp = document.createElement('canvas');
-        tmp.width = w;
-        tmp.height = h;
-        tmp.getContext('2d').putImageData(imageData, 0, 0);
-        octx.clearRect(0, 0, targetW, targetH);
-        octx.drawImage(tmp, productBounds.minX, productBounds.minY, cropW, cropH, dx, dy, dw, dh);
-        return out.toDataURL('image/png');
-      }
-
-      function processImage(img){
-        if (!img || img.dataset.finalTransparentDone === '1' || img.dataset.finalTransparentRunning === '1') return;
-        var source = getSource(img);
-        if (!source) return;
-        img.dataset.finalTransparentRunning = '1';
-        if (!img.dataset.originalSrc && source.indexOf('data:image') !== 0) img.dataset.originalSrc = source;
-
-        var loader = new Image();
-        loader.onload = function(){
-          try{
-            var naturalW = loader.naturalWidth || loader.width;
-            var naturalH = loader.naturalHeight || loader.height;
-            if (!naturalW || !naturalH) return done();
-            var maxSide = 900;
-            var scale = Math.min(1, maxSide / Math.max(naturalW, naturalH));
-            var w = Math.max(1, Math.round(naturalW * scale));
-            var h = Math.max(1, Math.round(naturalH * scale));
-            var canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            var ctx = canvas.getContext('2d', {willReadFrequently:true});
-            ctx.clearRect(0, 0, w, h);
-            ctx.drawImage(loader, 0, 0, w, h);
-            var imageData = ctx.getImageData(0, 0, w, h);
-            var productBounds = removeConnectedBackground(imageData, w, h);
-            ctx.putImageData(imageData, 0, 0);
-            var png = makePaddedPng(canvas, imageData, productBounds);
-            img.dataset.cleanedSrc = png;
-            img.src = png;
-            img.classList.add('is-final-transparent-png');
-            done();
-          } catch(e){ done(); }
-        };
-        loader.onerror = done;
-        loader.src = source;
-
-        function done(){
-          img.dataset.finalTransparentRunning = '0';
-          img.dataset.finalTransparentDone = '1';
-          img.classList.add('is-final-transparent-png');
-        }
-      }
-
-      function processVisible(){
-        Array.prototype.forEach.call(grid.querySelectorAll('.product-catagory-card:not(.is-hidden) .product-catagory-img img'), processImage);
-      }
-
-      function processAllSlowly(){
-        var imgs = Array.prototype.slice.call(grid.querySelectorAll('.product-catagory-img img'));
-        var i = 0;
-        function step(){
-          var end = Math.min(i + 5, imgs.length);
-          for (; i < end; i++) processImage(imgs[i]);
-          if (i < imgs.length) window.setTimeout(step, 120);
-        }
-        step();
-      }
-
-      /* Make sure 25 products show on each page even if older script loads first. */
-      function forceThirtyPerPage(){
-        var cards = Array.prototype.slice.call(grid.querySelectorAll('.product-catagory-card'));
-        var visibleCount = document.getElementById('productCatagoryVisible');
-        var totalText = document.getElementById('productCatagoryTotal');
-        var pageInfo = document.getElementById('productCatagoryPageInfo');
-        var prevButton = document.getElementById('productCatagoryPrev');
-        var nextButton = document.getElementById('productCatagoryNext');
-        var current = 1;
-        function totalPages(){ return Math.max(1, Math.ceil(cards.length / PAGE_SIZE)); }
-        function render(page){
-          current = Math.min(Math.max(1, page || 1), totalPages());
-          var start = (current - 1) * PAGE_SIZE;
-          var end = Math.min(start + PAGE_SIZE, cards.length);
-          cards.forEach(function(card, index){
-            var show = index >= start && index < end;
-            card.classList.toggle('is-hidden', !show);
-            card.style.display = show ? '' : 'none';
-          });
-          if (visibleCount) visibleCount.textContent = cards.length ? (start + 1) + '-' + end : '0';
-          if (totalText) totalText.textContent = 'of ' + cards.length + ' catagories';
-          if (pageInfo) pageInfo.textContent = 'Page ' + current + ' of ' + totalPages();
-          if (prevButton) prevButton.disabled = current <= 1;
-          if (nextButton) nextButton.disabled = current >= totalPages();
-          window.setTimeout(processVisible, 80);
-        }
-        if (prevButton && !prevButton.dataset.finalThirtyBound){
-          prevButton.dataset.finalThirtyBound = '1';
-          prevButton.addEventListener('click', function(){ window.setTimeout(function(){ render(current - 1); }, 5); });
-        }
-        if (nextButton && !nextButton.dataset.finalThirtyBound){
-          nextButton.dataset.finalThirtyBound = '1';
-          nextButton.addEventListener('click', function(){ window.setTimeout(function(){ render(current + 1); }, 5); });
-        }
-        render(1);
-      }
-
-      forceThirtyPerPage();
-      processVisible();
-      window.setTimeout(processAllSlowly, 700);
-
-      var next = document.getElementById('productCatagoryNext');
-      var prev = document.getElementById('productCatagoryPrev');
-      if (next) next.addEventListener('click', function(){ window.setTimeout(processVisible, 160); });
-      if (prev) prev.addEventListener('click', function(){ window.setTimeout(processVisible, 160); });
-    });
-  })();
-</script>
-
-
 <script id="infrastructure-video-carousel-10-slots">
   (function(){
     function ready(fn){
