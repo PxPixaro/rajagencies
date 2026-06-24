@@ -2317,6 +2317,34 @@
       pointer-events:none!important;
       background:linear-gradient(90deg, rgba(6,17,32,.50) 0%, rgba(6,17,32,.46) 38%, rgba(6,17,32,.40) 68%, rgba(6,17,32,.34) 100%)!important;
     }
+
+
+    /* Performance update: remove decorative shine sweeps for smoother scrolling and faster movement */
+    .hero::after,
+    .section::before,
+    .section-sm::before,
+    .surface::before,
+    .hero-card::before,
+    .footer-grid::before,
+    .band::before,
+    .contact-form-segment::before,
+    .brand-shell::before,
+    .award-card::before,
+    .timeline-card::before,
+    .branch-card::before,
+    .metric-card::before {
+      content:none!important;
+      display:none!important;
+      animation:none!important;
+    }
+    .brand-track,
+    .footer-road-showcase,
+    .footer-road-stage,
+    .asset-road-fleet,
+    .asset-road-vehicle {
+      animation:none!important;
+    }
+
 </style>
 <style id="raj-final-category-visible-fix">
 /* FINAL FIX BY CHATGPT: Product Catagory images original visible mode */
@@ -2469,7 +2497,24 @@ img, video{max-width:100%; height:auto;}
 @media (prefers-reduced-motion: reduce){
   *, *::before, *::after{animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; transition-duration:.01ms!important;}
 }
-</style></head>
+</style>
+<style id="raj-performance-smoothness-fix">
+  /* Smoothness optimization: lighter effects, faster motion, same visual layout */
+  .hero::after,.section::before,.section-sm::before,
+  .surface::before,.hero-card::before,.footer-grid::before,
+  .band::before,.contact-form-segment::before{display:none!important}
+  .auto-bg{opacity:.04!important}
+  .auto-bg img{animation-duration:12s!important}
+  .brand-track{animation-duration:18s!important}
+  .asset-road-vehicle{animation-duration:24s!important}
+  .asset-model{animation-duration:2s!important}
+  .asset-wheel{animation-duration:.22s!important}
+  .category-visual img,.segment-visual img,.contact-form-segment img{animation-duration:3.2s!important}
+  .geo-map-layer,.earth-map img,.geo-scan,.map-pin,.scan-ring,.geo-label,.location-step{animation-duration:12s!important}
+  .card,.why-card,.metric-card,.branch-card,.leader-card,.video-card,.award-card,.product-catagory-card{content-visibility:auto;contain-intrinsic-size:320px}
+  img{content-visibility:auto}
+</style>
+</head>
 <body>
 <div aria-hidden="true" class="scroll-progress" id="scrollProgress"></div>
 <div aria-hidden="true" class="auto-bg">
@@ -2688,13 +2733,13 @@ img, video{max-width:100%; height:auto;}
 <div class="container">
 <div class="product-catagory-head">
 <div>
-<div class="eyebrow">Product Catagory</div>
-<h2 class="section-title">All product catagories in one place.</h2>
-<p class="section-copy">Catagory folder se product images show ki gayi hain. Ek page me 25 catagories dikhengi; baaki dekhne ke liye Next / Previous button use karein.</p>
+<div class="eyebrow">Product Category</div>
+<h2 class="section-title">All product categories in one place.</h2>
+<p class="section-copy">Explore our wide range of product categories in a clear, organized view. Use Next and Previous to browse the complete catalogue.</p>
 </div>
 <div class="product-catagory-count">
 <strong id="productCatagoryVisible">1-25</strong>
-<span id="productCatagoryTotal">of 170 catagories</span>
+<span id="productCatagoryTotal">of 170 categories</span>
 </div>
 </div>
 <div class="product-catagory-grid" id="productCatagoryGrid">
@@ -3731,7 +3776,7 @@ img, video{max-width:100%; height:auto;}
 <div class="container band">
 <div class="eyebrow">What We Do</div>
 <h2 class="section-title">Operational strengths that drive market performance.</h2>
-<p class="section-copy">Presented as clear operational advantages to make the section more premium, less repetitive, and easier to scan.</p>
+<p class="section-copy">Our operational strengths are built around structured distribution, quick dispatch, digital visibility, and partner-focused support.</p>
 <div class="strength-grid">
 <div class="card metric-card">
 <div class="icon">📦</div>
@@ -3766,7 +3811,7 @@ img, video{max-width:100%; height:auto;}
 <div>
 <div class="eyebrow">Brand Associations</div>
 <h2 class="section-title">Trusted by 50+ reputed brand partners.</h2>
-<p class="section-copy">Trusted by leading automotive and industrial brands for structured regional distribution. Logo blocks are kept uniform, clean, and visible in original colors.</p>
+<p class="section-copy">Our brand partnerships reflect strong market trust, consistent regional distribution, and long-term collaboration across automotive, agriculture, and industrial segments.</p>
 </div>
 <a class="btn btn-dark" href="#contact">Discuss Partnership</a>
 </div>
@@ -3775,16 +3820,14 @@ img, video{max-width:100%; height:auto;}
 <div class="brand-stat"><strong>12–16</strong><span>Clean logos visible above the fold with carousel continuation below.</span></div>
 <div class="brand-stat"><strong>Color</strong><span>Equal-size logo boxes shown in original brand colors.</span></div>
 </div>
-<div class="brand-marquee">
-<div class="brand-track" id="brandTrack"></div>
-</div>
+
 </div>
 </section>
 <section class="section-sm" data-reveal="">
 <div class="container band">
 <div class="eyebrow">Why Choose Us</div>
 <h2 class="section-title">Why businesses choose Raj Agencies.</h2>
-<p class="section-copy">Current business scale and growth target are separated clearly so the section feels more credible and easier to understand.</p>
+<p class="section-copy">Strong business scale, consistent market coverage, and a growth-focused approach make Raj Agencies a dependable distribution partner.</p>
 <div class="why-grid">
 <div class="why-card"><strong>1997</strong><span>Established distribution foundation</span></div>
 <div class="why-card"><strong>₹80Cr+</strong><span>Current business scale</span></div>
@@ -3798,7 +3841,7 @@ img, video{max-width:100%; height:auto;}
 <div class="container">
 <div class="eyebrow">How It Works</div>
 <h2 class="section-title">A simple partnership process for smoother supply and growth.</h2>
-<p class="section-copy">Shorter step copy, clearer hierarchy, and a more professional timeline flow.</p>
+<p class="section-copy">A clear and simple process helps partners move from requirement sharing to dispatch with confidence and speed.</p>
 <div class="steps">
 <div class="card step">
 <div class="step-number">01</div>
@@ -3848,7 +3891,7 @@ img, video{max-width:100%; height:auto;}
 <div class="container">
 <div class="eyebrow">Branch Network</div>
 <h2 class="section-title">Strategically located branches for faster regional service.</h2>
-<p class="section-copy">Branch details are shown as full cards so the section feels more complete, more premium, and more informative.</p>
+<p class="section-copy">Our strategically placed branches help improve market reach, delivery speed, and customer support across the region.</p>
 <div class="branch-grid">
 <div class="card branch-card featured">
 <small>Head Office</small>
@@ -3899,7 +3942,7 @@ img, video{max-width:100%; height:auto;}
 <div class="container">
 <div class="eyebrow">Meet the Leadership</div>
 <h2 class="section-title">Experienced leadership behind our operations.</h2>
-<p class="section-copy">The leadership block now matches the actual content better: two leaders plus one stronger team and departments card.</p>
+<p class="section-copy">Our leadership team brings experience, direction, and operational discipline to every part of the business.</p>
 <div class="leadership-grid">
 <article class="card leader-card">
 <div class="leader-visual">
@@ -3965,7 +4008,7 @@ img, video{max-width:100%; height:auto;}
 </div>
 <div class="video-meta">
 <h3>Warehouse Operations</h3>
-<p>Use this lead video to showcase warehouse movement, inventory flow, and internal discipline.</p>
+<p>Warehouse operations are managed with structured movement, organized inventory flow, and strong internal discipline.</p>
 </div>
 </article>
 <article class="card video-card">
@@ -3976,7 +4019,7 @@ img, video{max-width:100%; height:auto;}
 </div>
 <div class="video-meta">
 <h3>Dispatch Workflow</h3>
-<p>Use this video for dispatch coordination, loading flow, and service support visibility.</p>
+<p>Dispatch workflow is focused on timely coordination, careful loading, and dependable delivery support.</p>
 </div>
 </article>
 </div>
@@ -4041,7 +4084,7 @@ img, video{max-width:100%; height:auto;}
 <source src="./assets/showcase-video-7.mp4" type="video/mp4"/>
 </video>
 </div>
-<div class="video-meta"><h3>Stock Arrangement</h3><p>Show rack arrangement, product category flow, and storage quality.</p></div>
+<div class="video-meta"><h3>Stock Arrangement</h3><p>Organized stock arrangement ensures faster identification, better storage quality, and smoother product movement.</p></div>
 </article>
 <article class="card video-card">
 <div class="video-shell">
@@ -4049,7 +4092,7 @@ img, video{max-width:100%; height:auto;}
 <source src="./assets/showcase-video-8.mp4" type="video/mp4"/>
 </video>
 </div>
-<div class="video-meta"><h3>Service Support</h3><p>Add support team, customer handling, or daily operations video.</p></div>
+<div class="video-meta"><h3>Service Support</h3><p>Dedicated service support helps customers with product guidance, order coordination, and dependable after-sales assistance.</p></div>
 </article>
 <article class="card video-card">
 <div class="video-shell">
@@ -4057,7 +4100,7 @@ img, video{max-width:100%; height:auto;}
 <source src="./assets/showcase-video-9.mp4" type="video/mp4"/>
 </video>
 </div>
-<div class="video-meta"><h3>Branch Activity</h3><p>Use this slot for branch footage, team work, or market coverage.</p></div>
+<div class="video-meta"><h3>Branch Activity</h3><p>Branch activity highlights active market coordination, team execution, and regional service coverage.</p></div>
 </article>
 <article class="card video-card">
 <div class="video-shell">
@@ -4077,7 +4120,7 @@ img, video{max-width:100%; height:auto;}
 <div class="card award-card">
 <div class="eyebrow">Awards &amp; Recognitions</div>
 <h2 class="section-title">Achievements that reflect the journey.</h2>
-<p class="section-copy">All 26 certificate images are loaded from the assets folder, plus 4 blank certificate slots are ready for future awards in the same premium carousel.</p>
+<p class="section-copy">A curated showcase of certificates and recognitions highlights Raj Agencies’ trusted partnerships, service consistency, and continued commitment to professional growth.</p>
 <div class="award-gallery" id="awardGallery">
 <div class="award-slides" id="awardSlides"></div>
 <div class="award-controls">
@@ -4086,7 +4129,7 @@ img, video{max-width:100%; height:auto;}
 <button aria-label="Next award frame" class="award-arrow" id="awardNext" type="button">›</button>
 </div>
 </div>
-<p class="award-note">Put images inside the assets folder as CERTIFICATE2 (1).png to CERTIFICATE2 (26).png. Four extra blank certificate slots are added after Certificate 26 for future awards.</p>
+<p class="award-note">Our awards and recognitions reflect the trust, performance, and long-term partnerships built across our distribution network.</p>
 </div>
 </div>
 </section>
@@ -4095,7 +4138,7 @@ img, video{max-width:100%; height:auto;}
 <div class="location-copy">
 <div class="eyebrow">Satellite Location View</div>
 <h2 class="section-title">From world view to our exact Gujarat location.</h2>
-<p class="section-copy">A cinematic satellite-style zoom path highlights Raj Agencies from the world map to India, Gujarat, and the exact business location.</p>
+<p class="section-copy">Locate Raj Agencies with a clear satellite view, from the global map to Gujarat and our exact business address.</p>
 <div class="coordinate-card">
 <small>Exact Coordinates</small>
 <strong>21.262507442967276, 72.9607725366462</strong>
@@ -4250,64 +4293,13 @@ img, video{max-width:100%; height:auto;}
 </div>
 </div>
 </div>
-<div aria-label="Animated road movement showing Raj Agencies vehicle segment coverage" class="footer-road-showcase footer-road-final">
-<h3>Raj Agencies mobility network</h3>
-<p>2 Wheeler → 3 Wheeler → Car → Small Truck → Big Truck → Tractor → JCB — same-speed convoy movement with uniform 3D vehicle sizing and spinning wheels.</p>
-<div aria-hidden="true" class="footer-road-stage">
-<div class="footer-road"></div>
-<div class="road-glow"></div>
-<div aria-label="Same-speed 3D asset vehicle convoy" class="road-fleet asset-road-fleet">
-<figure aria-label="1. 2 Wheeler" class="asset-road-vehicle asset-bike" style="--delay:-36s;--w1x:30%;--w1y:79%;--w2x:72%;--w2y:79%;">
-<div class="asset-model">
-<img alt="2 Wheeler segment" data-asset-files="bike.png,bike.PNG,bike(2).png,bike(2).PNG" decoding="async" fetchpriority="low" loading="lazy"/>
-<span class="asset-wheel wh1"></span><span class="asset-wheel wh2"></span>
-</div>
-</figure>
-<figure aria-label="2. 3 Wheeler" class="asset-road-vehicle asset-auto" style="--delay:-30s;--w1x:30%;--w1y:78%;--w2x:72%;--w2y:78%;">
-<div class="asset-model">
-<img alt="3 Wheeler segment" data-asset-files="auto.png,auto.PNG,auto(4).png,auto(4).PNG" decoding="async" fetchpriority="low" loading="lazy"/>
-<span class="asset-wheel wh1"></span><span class="asset-wheel wh2"></span>
-</div>
-</figure>
-<figure aria-label="3. Car" class="asset-road-vehicle asset-car" style="--delay:-24s;--w1x:31%;--w1y:78%;--w2x:73%;--w2y:78%;">
-<div class="asset-model">
-<img alt="Car segment" data-asset-files="car.png,car.PNG,car(2).png,car(2).PNG" decoding="async" fetchpriority="low" loading="lazy"/>
-<span class="asset-wheel wh1"></span><span class="asset-wheel wh2"></span>
-</div>
-</figure>
-<figure aria-label="4. Small Truck" class="asset-road-vehicle asset-small-truck" style="--delay:-18s;--w1x:28%;--w1y:80%;--w2x:72%;--w2y:80%;">
-<div class="asset-model">
-<img alt="Small truck segment" data-asset-files="tataace.png,tataace.PNG,tataace(4).png,tataace(4).PNG" decoding="async" fetchpriority="low" loading="lazy"/>
-<span class="asset-wheel wh1"></span><span class="asset-wheel wh2"></span>
-</div>
-</figure>
-<figure aria-label="5. Big Truck" class="asset-road-vehicle asset-big-truck" style="--delay:-12s;--w1x:23%;--w1y:80%;--w2x:55%;--w2y:80%;--w3x:78%;--w3y:80%;">
-<div class="asset-model">
-<img alt="Big truck segment" data-asset-files="truck.png,truck.PNG,truck(2).png,truck(2).PNG" decoding="async" fetchpriority="low" loading="lazy"/>
-<span class="asset-wheel wh1"></span><span class="asset-wheel wh2"></span><span class="asset-wheel wh3"></span>
-</div>
-</figure>
-<figure aria-label="6. Tractor" class="asset-road-vehicle asset-tractor" style="--delay:-6s;--w1x:28%;--w1y:79%;--w2x:75%;--w2y:79%;">
-<div class="asset-model">
-<img alt="Tractor segment" data-asset-files="tractor.png,tractor.PNG,tractor(2).png,tractor(2).PNG" decoding="async" fetchpriority="low" loading="lazy"/>
-<span class="asset-wheel wh1"></span><span class="asset-wheel wh2"></span>
-</div>
-</figure>
-<figure aria-label="7. JCB" class="asset-road-vehicle asset-jcb" style="--delay:0s;--w1x:28%;--w1y:80%;--w2x:70%;--w2y:80%;">
-<div class="asset-model">
-<img alt="JCB segment" data-asset-files="jcb.png,jcb.PNG,jcb.jpg,jcb.JPG" decoding="async" fetchpriority="low" loading="lazy"/>
-<span class="asset-wheel wh1"></span><span class="asset-wheel wh2"></span>
-</div>
-</figure>
-</div> </div>
-</div>
+
 </div>
 </div>
 <div class="footer-bottom">
 <span>© 2026 Raj Agencies. All rights reserved.</span>
 <span>Premium distribution website enhanced with cinematic location, motion effects, and stronger visual branding.</span>
 </div>
-
 </footer>
 <script>
     const topbar = document.getElementById('topbar');
@@ -4451,15 +4443,7 @@ img, video{max-width:100%; height:auto;}
 
 
 
-    document.querySelectorAll('.card').forEach((card) => {
-      card.addEventListener('pointermove', (event) => {
-        const rect = card.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width) * 100;
-        const y = ((event.clientY - rect.top) / rect.height) * 100;
-        card.style.setProperty('--mx', x + '%');
-        card.style.setProperty('--my', y + '%');
-      });
-    });
+    /* Pointer-tracking glow removed for smoother scrolling on large pages. */
 
     const chips = document.querySelectorAll('#filterChips .chip');
     const categoryCards = document.querySelectorAll('#categoryGrid [data-segment]');
@@ -4486,33 +4470,7 @@ img, video{max-width:100%; height:auto;}
       });
     }
 
-    const brandFiles = [
-      'BRAND 1 (1).jpg','BRAND 1 (1).png','BRAND 1 (2).JPG','BRAND 1 (2).png','BRAND 1 (3).jpg','BRAND 1 (3).png',
-      'BRAND 1 (4).jpg','BRAND 1 (4).png','BRAND 1 (5).jpg','BRAND 1 (5).png','BRAND 1 (6).jpg','BRAND 1 (6).png',
-      'BRAND 1 (7).jpg','BRAND 1 (8).jpg','BRAND 1 (9).jpg','BRAND 1 (10).jpg','BRAND 1 (11).jpg','BRAND 1 (12).jpg',
-      'BRAND 1 (13).jpg','BRAND 1 (14).jpg','BRAND 1 (15).jpg','BRAND 1 (16).jpg','BRAND 1 (17).jpg','BRAND 1 (18).jpg',
-      'BRAND 1 (19).jpg','BRAND 1 (20).jpg','BRAND 1 (21).jpg','BRAND 1 (22).jpg','BRAND 1 (23).jpg','BRAND 1 (24).jpg',
-      'BRAND 1 (25).jpg','BRAND 1 (26).jpg','BRAND 1 (27).jpg','BRAND 1 (28).jpg','BRAND 1 (29).jpg','BRAND 1 (30).jpg',
-      'BRAND 1 (31).jpg','BRAND 1 (32).jpg','BRAND 1 (33).jpg','BRAND 1 (34).jpg','BRAND 1 (35).jpg','BRAND 1 (36).jpg',
-      'BRAND 1 (37).jpg','BRAND 1 (38).jpg','BRAND 1 (39).jpg','BRAND 1 (40).jpg','BRAND 1 (41).jpg','BRAND 1 (42).jpg',
-      'BRAND 1 (43).jpg','BRAND 1 (44).jpg'
-    ];
-
-    const brandTrack = document.getElementById('brandTrack');
-    if (brandTrack) {
-      const filesForLoop = [...brandFiles, ...brandFiles.slice(0, 12)];
-      filesForLoop.forEach((file, index) => {
-        const pill = document.createElement('div');
-        pill.className = 'brand-pill';
-
-        const img = document.createElement('img');
-        img.alt = 'Brand Logo ' + (index + 1);
-        img.src = './assets/' + file.replace(/ /g, '%20').replace(/\(/g, '%28').replace(/\)/g, '%29');
-
-        pill.appendChild(img);
-        brandTrack.appendChild(pill);
-      });
-    }
+    // Brand logo moving carousel removed for faster page performance.
 
     const awardSlidesWrap = document.getElementById('awardSlides');
     const awardDotsWrap = document.getElementById('awardDots');
@@ -4639,7 +4597,7 @@ img, video{max-width:100%; height:auto;}
 <div class="product-catagory-modal-img">
 <img alt="" decoding="async" fetchpriority="low" id="productCatagoryModalImage" loading="lazy" src=""/>
 </div>
-<h3 class="product-catagory-modal-title" id="productCatagoryModalTitle">Product Catagory</h3>
+<h3 class="product-catagory-modal-title" id="productCatagoryModalTitle">Product Category</h3>
 </div>
 </div>
 <script id="product-catagory-pagination-preview">
@@ -4667,7 +4625,7 @@ img, video{max-width:100%; height:auto;}
       function titleFromCard(card){
         var title = card.querySelector('h3');
         var img = card.querySelector('img');
-        return (title && title.textContent.trim()) || (img && img.alt) || 'Product Catagory';
+        return (title && title.textContent.trim()) || (img && img.alt) || 'Product Category';
       }
 
       function edgeHasMode(data, w, h, mode){
@@ -4946,7 +4904,6 @@ img, video{max-width:100%; height:auto;}
       updateCatagoryGrid(false);
     })();
 </script>
-
 <script id="infrastructure-video-carousel-10-slots">
   (function(){
     function ready(fn){
@@ -5166,7 +5123,6 @@ img, video{max-width:100%; height:auto;}
     #productCatagoryModal .product-catagory-modal-title{margin:12px 44px 0!important;font-size:18px!important}
   }
 </style>
-
 <script>
 (function(){
   /* Hero background image fallback checker: tries assets folder first, then root. */
